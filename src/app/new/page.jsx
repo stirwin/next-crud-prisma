@@ -7,20 +7,22 @@ export default function page({ params }) {
 
   //const de use router para redirecionar
   const router = useRouter();
-//obtiene los datos para enviarlos si esta en edit
-const [title,setTitle]=useState("");
-const [description,setDescription]=useState("");
+  //obtiene los datos para enviarlos si esta en edit
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
 
 
 
   //accede a los datos del usuario dependiendo de la ruta en la que se este
   useEffect(() => {
-    fetch(`/api/task/${params.id}`)
-      .then(res => res.json())
-      .then(data => { 
-        setTitle(data.title)
-        setDescription(data.title)
-       })
+    if (params.id) {
+      fetch(`/api/task/${params.id}`)
+        .then(res => res.json())
+        .then(data => {
+          setTitle(data.title)
+          setDescription(data.description)
+        });
+    }
   }, [])
 
   //captura los datos del formulario
@@ -32,25 +34,37 @@ const [description,setDescription]=useState("");
     const title = e.target.title.value
     const description = e.target.description.value
 
-   if (params.id) {
-    console.log("update");
-   }else{
-     //evia los datos 
-     const res = await fetch('/api/task', {
-      method: 'POST',
-      body: JSON.stringify({ title, description }),
-      headers: {
-        'Contet-Type': 'application/json'
-      }
-    });
+    if (params.id) {
+      const res = await fetch(`/api/task/${params.id}`, {
+        method: "PUT",
+        body: JSON.stringify({ title, description }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      //se obtiene la respuesta
+      const data = await res.json();
+      console.log(data);
 
-    //se obtiene la respuesta
-    const data = await res.json();
-    console.log(data);
-   }
+    } else {
+      //evia los datos 
+      const res = await fetch('/api/task', {
+        method: 'POST',
+        body: JSON.stringify({ title, description }),
+        headers: {
+          'Contet-Type': 'application/json'
+        }
+      });
 
+      //se obtiene la respuesta
+      const data = await res.json();
+      console.log(data);
+    }
+
+    //refresca los datos
+    router.refresh();
     //redirige depues que envie 
-    router.push("/")
+    router.push("/");
   }
 
   return (
@@ -66,15 +80,33 @@ const [description,setDescription]=useState("");
           className='border border-gray-400 p-2 mb-4 w-full text-black'
           placeholder='titulo'
           //recibe el valor de lo que venga en el set
-          onChange={(e)=>setTitle(e.target.value)}
+          onChange={(e) => setTitle(e.target.value)}
           value={title} />
 
         <textarea rows="3" id='description' className='border border-gray-400 p-2 mb-4 w-full text-black'
           placeholder='describe la tarea'
-          onChange={(e)=>setDescription(e.target.value  )}
+          onChange={(e) => setDescription(e.target.value)}
           value={description}></textarea>
-          
-        <button className=' border p-2 rounded bg-blue-500'>crear</button>
+
+        <div className="flex justify-between">
+          <button className=' border p-2 rounded bg-blue-500'
+            type="submit">crear</button>
+
+          {params.id && (
+            <button className="bg-red-500 border p-2 rounded" type="button"
+              onClick={async () => {
+                const res = await fetch(`/api/task/${params.id}`, {
+                  method: "DELETE",
+                })
+                const data = await res.json();
+                router.refresh();
+                router.push("/");
+              }}> Delete </button>
+          )
+
+          }
+        </div>
+
       </form>
 
     </div>
