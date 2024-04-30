@@ -1,6 +1,9 @@
 import TaskCard from "@/components/TaskCard";
 import { prisma } from "@/libs/prisma";
 
+export const revalidate = 0;
+
+
 async function LoadTask() {
 
   //CON PRISMA
@@ -21,7 +24,7 @@ async function HomePage() {
     <section className="container mx-auto">
       <div className="grid grid-cols-3 gap-3 mt-10 ">
         {tasks.map(task => (
-        <TaskCard task={task}/>
+        <TaskCard key={task.id} task={task}/>
         ))
 
         }

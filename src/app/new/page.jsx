@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function page({ params }) {
+export default function New({ params }) {
 
   //const de use router para redirecionar
   const router = useRouter();
